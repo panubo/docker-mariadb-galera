@@ -15,6 +15,7 @@ if [ "$1" = 'mysqld' ]; then
 
 	rm -f /etc/mysql/conf.d/galera-tmp.cnf
 	if [ "$MARIADB_MAJOR" = "10.1" ] && [ -n "$WSREP_CLUSTER_ADDRESS" ]; then
+		echo "Creating Galera Config"
 		export MYSQL_INITDB_SKIP_TZINFO="yes"
 		export MYSQL_ALLOW_EMPTY_PASSWORD="yes"
 
