@@ -1,6 +1,6 @@
 FROM mariadb:10.1
 
-RUN apt-get update && apt-get install -y percona-xtrabackup socat galera-arbitrator-3 && \
+RUN apt-get update && apt-get install -y percona-xtrabackup socat rsync netcat galera-arbitrator-3 && \
     rm -rf /var/lib/apt/lists/*
 
 COPY docker-entrypoint.sh /usr/local/bin/
