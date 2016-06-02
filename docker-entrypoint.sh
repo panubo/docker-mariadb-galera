@@ -1,4 +1,7 @@
 #!/bin/bash
+
+[ "$DEBUG" == 'true' ] && set -x
+
 set -eo pipefail
 
 # if command starts with an option, prepend mysqld
