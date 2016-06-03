@@ -9,29 +9,57 @@ if [ "${1:0:1}" = '-' ]; then
 	set -- mysqld "$@"
 fi
 
-if [ "$1" = 'mysqld' ]; then
-	# Get config
-	DATADIR="$("$@" --verbose --help --log-bin-index=`mktemp -u` 2>/dev/null | awk '$1 == "datadir" { print $2; exit }')"
+# skip setup if they want an option that stops mysqld
+wantHelp=
+for arg; do
+	case "$arg" in
+		-'?'|--help|--print-defaults|-V|--version)
+			wantHelp=1
+			break
+			;;
+	esac
+done
 
-	rm -f /etc/mysql/conf.d/galera-tmp.cnf
-	if [ "$MARIADB_MAJOR" = "10.1" ] && [ -n "$WSREP_CLUSTER_ADDRESS" ]; then
-		echo "Creating Galera Config"
+_datadir() {
+	"$@" --verbose --help --log-bin-index=`mktemp -u` 2>/dev/null | awk '$1 == "datadir" { print $2; exit }'
+}
+
+# allow the container to be started with `--user`
+if [ "$1" = 'mysqld' -a -z "$wantHelp" -a "$(id -u)" = '0' ]; then
+	DATADIR="$(_datadir "$@")"
+	mkdir -p "$DATADIR"
+	chown -R mysql:mysql "$DATADIR"
+	exec gosu mysql "$BASH_SOURCE" "$@"
+fi
+
+if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
+	# Get config
+	DATADIR="$(_datadir "$@")"
+
+	if [ -n "$WSREP_CLUSTER_ADDRESS" ]; then
+		echo 'Creating Galera Config'
 		export MYSQL_INITDB_SKIP_TZINFO="yes"
 		export MYSQL_ALLOW_EMPTY_PASSWORD="yes"
 
 		cat <<- EOF > /etc/mysql/conf.d/galera-tmp.cnf
-		[mysqld]
-		binlog_format="ROW"
-		wsrep_on="ON"
+		# Galera Cluster Config
+		[server]
+		bind-address="0.0.0.0"
+		binlog_format="row"
+		default_storage_engine="InnoDB"
 		innodb_autoinc_lock_mode="2"
-		wsrep_log_conflicts="${WSREP_LOG_CONFLICTS-OFF}"
-		wsrep_provider="${WSREP_PROVIDER-/usr/lib/libgalera_smm.so}"
+		innodb_locks_unsafe_for_binlog="1"
+
+		[galera]
+		wsrep_on="on"
+		wsrep_provider="${WSREP_PROVIDER:-/usr/lib/libgalera_smm.so}"
 		wsrep_provider_options="${WSREP_PROVIDER_OPTIONS}"
 		wsrep_cluster_address="${WSREP_CLUSTER_ADDRESS}"
-		wsrep_cluster_name="${WSREP_MYSQL_CLUSTER_NAME-my_wsrep_cluster}"
+		wsrep_cluster_name="${WSREP_MYSQL_CLUSTER_NAME:-my_wsrep_cluster}"
 		wsrep_sst_auth="${WSREP_SST_AUTH}"
-		wsrep_sst_method="${WSREP_SST_METHOD-rsync}"
+		wsrep_sst_method="${WSREP_SST_METHOD:-rsync}"
 		EOF
+
 		if [ -n "$WSREP_NODE_ADDRESS" ]; then
 			echo wsrep_node_address="${WSREP_NODE_ADDRESS}" >> /etc/mysql/conf.d/galera-tmp.cnf
 		fi
@@ -46,13 +74,12 @@ if [ "$1" = 'mysqld' ]; then
 		fi
 
 		mkdir -p "$DATADIR"
-		chown -R mysql:mysql "$DATADIR"
 
 		echo 'Initializing database'
-		mysql_install_db --user=mysql --datadir="$DATADIR" --rpm
+		mysql_install_db --datadir="$DATADIR" --rpm
 		echo 'Database initialized'
 
-		"$@" --skip-networking --wsrep_cluster_address=${WSREP_CLUSTER_ADDRESS+gcomm://} &
+		"$@" --skip-networking &
 		pid="$!"
 
 		mysql=( mysql --protocol=socket -uroot )
@@ -129,8 +156,6 @@ if [ "$1" = 'mysqld' ]; then
 		echo 'MySQL init process done. Ready for start up.'
 		echo
 	fi
-
-	chown -R mysql:mysql "$DATADIR"
 fi
 
 exec "$@"
