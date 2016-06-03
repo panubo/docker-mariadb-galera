@@ -9,8 +9,8 @@ This container uses the entrypoint modifications similar to the ones by [Kristia
 
 ### Environment Arguments
 
-- `WSREP_NODE_ADDRESS` eg `WSREP_NODE_ADDRESS=10.0.0.1`
-- `WSREP_CLUSTER_ADDRESS` eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1,10.0.0.2,10.0.0.3`
+- `WSREP_NODE_ADDRESS` - IP or domain of host interface eg `WSREP_NODE_ADDRESS=10.0.0.1`
+- `WSREP_CLUSTER_ADDRESS` - List of cluster nodes eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1,10.0.0.2,10.0.0.3`
 
 ### Bootstrapping the cluster
 
