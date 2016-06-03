@@ -6,7 +6,7 @@ set -eo pipefail
 
 if [ -n "$WSREP_CLUSTER_ADDRESS" ]; then
 
-	echo 'Creating Galera Config'
+	echo '>> Creating Galera Config'
 	export MYSQL_INITDB_SKIP_TZINFO="yes"
 	export MYSQL_ALLOW_EMPTY_PASSWORD="yes"
 

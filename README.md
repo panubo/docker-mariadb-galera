@@ -1,6 +1,53 @@
 # Docker Container for MariaDB Galera Cluster
 
-We hope that this container will not be required in the future pending the integration of
-this [pull request](https://github.com/docker-library/mariadb/pull/24/files).
+We hope that this container will not be required in the future pending the integration better Galera support in the official container.
+eg [PR 24](https://github.com/docker-library/mariadb/pull/24/files).
 
-This container uses the entrypoint modifications by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
+This container uses the entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
+
+## Usage
+
+### Environment Arguments
+
+- `WSREP_NODE_ADDRESS` eg `WSREP_NODE_ADDRESS=10.0.0.1`
+- `WSREP_CLUSTER_ADDRESS` eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1,10.0.0.2,10.0.0.3`
+
+### Bootstrapping the cluster
+
+Node 1:
+
+```
+docker run -d --net host --name galera \
+  -e WSREP_NODE_ADDRESS=$WSREP_NODE_ADDRESS \
+  -e WSREP_CLUSTER_ADDRESS=$WSREP_CLUSTER_ADDRESS \
+  -e MYSQL_ROOT_PASSWORD={{ mysql_root_password }} \
+  -p 3306:3306 \
+  -p 4567:4567/udp \
+  -p 4567-4568:4567-4568 \
+  -p 4444:4444 \
+  -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
+  panubo/mariadb-galera \
+    --wsrep-new-cluster
+```
+ 
+Node 2-N:
+
+Create empty mysql dir to [skip database initialisation](https://github.com/docker-library/mariadb/pull/57). (Kludge!)
+
+```
+mkdir -p /mnt/data/galera.service/mysql/mysql
+```
+
+Start the container normally (without `--wsrep-new-cluster`).
+
+```
+docker run -d --net host --name galera \
+  -e WSREP_NODE_ADDRESS=$WSREP_NODE_ADDRESS \
+  -e WSREP_CLUSTER_ADDRESS=$WSREP_CLUSTER_ADDRESS \
+  -p 3306:3306 \
+  -p 4567:4567/udp \
+  -p 4567-4568:4567-4568 \
+  -p 4444:4444 \
+  -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
+  panubo/mariadb-galera
+```
