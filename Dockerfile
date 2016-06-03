@@ -6,3 +6,6 @@ RUN apt-get update && apt-get install -y galera-arbitrator-3 && \
 COPY galera-entrypoint.sh /
 
 EXPOSE 3306 4444 4567 4567/udp 4568
+
+ENTRYPOINT ["/galera-entrypoint.sh"]
+CMD ["mysqld"]
