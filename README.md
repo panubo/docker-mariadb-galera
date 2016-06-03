@@ -51,3 +51,5 @@ docker run -d --net host --name galera \
   -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
   panubo/mariadb-galera
 ```
+
+NB: Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
