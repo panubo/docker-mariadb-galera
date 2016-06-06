@@ -5,12 +5,26 @@ eg [PR 24](https://github.com/docker-library/mariadb/pull/24/files).
 
 This container uses the entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
 
+Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webpages/arbitrator.html) (aka `garbd`) which allows you to maintain quorum with a two node cluster.
+
 ## Usage
 
 ### Environment Arguments
 
 - `WSREP_NODE_ADDRESS` - IP or domain of host interface eg `WSREP_NODE_ADDRESS=10.0.0.1`
-- `WSREP_CLUSTER_ADDRESS` - List of cluster nodes eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1,10.0.0.2,10.0.0.3`
+- `WSREP_CLUSTER_ADDRESS` - List of cluster nodes and ports eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1:4567,10.0.0.2:4567,10.0.0.3:4567`
+- `WSREP_CLUSTER_NAME` - Default `my_wsrep_cluster`
+
+### Running Garbd
+
+Garbd is available. Just specify `garbd` as the command.
+
+```
+docker run -d --net host --name galera-garbd \
+  -e WSREP_CLUSTER_ADDRESS=$WSREP_CLUSTER_ADDRESS \
+  panubo/mariadb-galera \
+    garbd
+```
 
 ### Bootstrapping the cluster
 
@@ -85,4 +99,6 @@ systemctl start galera.service
 ```
 # Gotchas
 
-Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the (duplicated) Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
+1. Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the (duplicated) Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
+
+2. Garbd requires an explicit port if it blows up with `"Exception in creating receive loop."` See [issue 312](https://github.com/codership/galera/issues/312).
