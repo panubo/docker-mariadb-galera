@@ -52,4 +52,37 @@ docker run -d --net host --name galera \
   panubo/mariadb-galera
 ```
 
-NB: Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
+## Recovery
+
+Recovery when quorum is lost can often be simply recovered:
+
+Stop on all nodes. EG:
+
+```
+systemctl stop galera.service
+```
+
+Start node with most complete / recent data set with `--wsrep-new-cluster` argument. EG:
+
+```
+docker run -d --net host --name galera-init \
+  -e WSREP_NODE_ADDRESS=$WSREP_NODE_ADDRESS \
+  -e WSREP_CLUSTER_ADDRESS=$WSREP_CLUSTER_ADDRESS \
+  -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+  -p 3307:3306 \
+  -p 4567:4567/udp \
+  -p 4567-4568:4567-4568 \
+  -p 4444:4444 \
+  -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
+  panubo/mariadb-galera \
+    --wsrep-new-cluster
+```
+
+Bring up other nodes normally. Eg
+
+```
+systemctl start galera.service
+```
+# Gotchas
+
+Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the (duplicated) Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
