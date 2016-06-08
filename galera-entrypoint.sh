@@ -4,7 +4,9 @@
 
 set -eo pipefail
 
-if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then
+COMMAND=${1:-'mysqld'}
+
+if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'mysqld' ]; then
 
 	echo '>> Creating Galera Config'
 	export MYSQL_INITDB_SKIP_TZINFO="yes"
@@ -33,7 +35,7 @@ if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then
     		echo wsrep_node_address="${WSREP_NODE_ADDRESS}" >> /etc/mysql/conf.d/galera-auto-generated.cnf
 	fi
 
-elif [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'garbd' ]; then
+elif [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'garbd' ]; then
 
 	echo '>> Configuring Garbd'
 	set -- "$@" --address=$WSREP_CLUSTER_ADDRESS --group=${WSREP_CLUSTER_NAME:-my_wsrep_cluster} --name=$(hostname)
