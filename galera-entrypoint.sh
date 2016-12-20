@@ -5,6 +5,7 @@
 set -eo pipefail
 
 COMMAND=${1:-'mysqld'}
+set -- ${COMMAND} "$@"
 
 if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'mysqld' ]; then
 
@@ -41,5 +42,4 @@ elif [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'garbd' ]; then
 	set -- "$@" --address=$WSREP_CLUSTER_ADDRESS --group=${WSREP_CLUSTER_NAME:-my_wsrep_cluster} --name=$(hostname)
 
 fi
-
 exec /docker-entrypoint.sh "$@"
