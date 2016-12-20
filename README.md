@@ -1,9 +1,9 @@
 # Docker Container for MariaDB Galera Cluster
 
-We hope that this container will not be required in the future pending the integration better Galera support in the official container.
+We hope that this container will not be required in the future pending the integration of better Galera support in the official container.
 eg [PR 24](https://github.com/docker-library/mariadb/pull/24/files).
 
-This container uses the entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
+This container uses entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
 
 Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webpages/arbitrator.html) (aka `garbd`) which allows you to maintain quorum with a two node cluster.
 
@@ -68,15 +68,15 @@ docker run -d --net host --name galera \
 
 ## Recovery
 
-Recovery when quorum is lost can often be simply recovered:
+Recovery when quorum is lost is fairly simple:
 
-Stop on all nodes. Eg (if using a Systemd unit to run Galera):
+First, stop on all nodes. Eg (if using a Systemd unit to run Galera):
 
 ```
 systemctl stop galera.service
 ```
 
-Start node with most complete / recent data set with `--wsrep-new-cluster` argument. EG:
+Secondly, start node with most complete / recent data set with `--wsrep-new-cluster` argument. EG:
 
 ```
 docker run -d --net host --name galera-init \
@@ -92,11 +92,12 @@ docker run -d --net host --name galera-init \
     --wsrep-new-cluster
 ```
 
-Bring up other nodes normally. Eg. (systemd example)
+Finaly, bring up other nodes normally. Eg. (systemd example)
 
 ```
 systemctl start galera.service
 ```
+
 # Gotchas
 
 1. Whilst it isn't strictly necessary to use the host network (`--net host`), there seems to be an issue (bug?) whereby Galera gets both the host and the (duplicated) Docker network IP assigned to the node. This causes issues when multiple nodes fail and attempt to rejoin the cluster.
