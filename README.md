@@ -43,7 +43,7 @@ docker run -d --net host --name galera \
   panubo/mariadb-galera \
     --wsrep-new-cluster
 ```
- 
+
 Node 2-N:
 
 Create empty mysql dir to [skip database initialisation](https://github.com/docker-library/mariadb/pull/57). (Kludge!)
@@ -70,7 +70,7 @@ docker run -d --net host --name galera \
 
 Recovery when quorum is lost can often be simply recovered:
 
-Stop on all nodes. EG:
+Stop on all nodes. Eg (if using a Systemd unit to run Galera):
 
 ```
 systemctl stop galera.service
@@ -92,7 +92,7 @@ docker run -d --net host --name galera-init \
     --wsrep-new-cluster
 ```
 
-Bring up other nodes normally. Eg
+Bring up other nodes normally. Eg. (systemd example)
 
 ```
 systemctl start galera.service
