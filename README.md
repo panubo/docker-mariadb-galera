@@ -5,7 +5,7 @@ eg [PR 24](https://github.com/docker-library/mariadb/pull/24/files).
 
 This container uses entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
 
-Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webpages/arbitrator.html) (aka `garbd`) which allows you to maintain quorum with a two node cluster.
+Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webpages/arbitrator.html) (aka `garbd`) which allows you to maintain quorum with a two node cluster. (Not required when running 3 or more nodes).
 
 ## Usage
 
