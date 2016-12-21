@@ -4,10 +4,7 @@
 
 set -eo pipefail
 
-COMMAND=${1:-'mysqld'}
-set -- ${COMMAND} "$@"
-
-if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'mysqld' ]; then
+if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then
 
 	echo '>> Creating Galera Config'
 	export MYSQL_INITDB_SKIP_TZINFO="yes"
@@ -36,10 +33,11 @@ if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'mysqld' ]; then
     		echo wsrep_node_address="${WSREP_NODE_ADDRESS}" >> /etc/mysql/conf.d/galera-auto-generated.cnf
 	fi
 
-elif [ -n "$WSREP_CLUSTER_ADDRESS" -a "$COMMAND" == 'garbd' ]; then
+elif [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'garbd' ]; then
 
 	echo '>> Configuring Garbd'
 	set -- "$@" --address=$WSREP_CLUSTER_ADDRESS --group=${WSREP_CLUSTER_NAME:-my_wsrep_cluster} --name=$(hostname)
 
 fi
+
 exec /docker-entrypoint.sh "$@"

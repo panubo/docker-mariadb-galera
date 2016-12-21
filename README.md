@@ -41,6 +41,7 @@ docker run -d --net host --name galera \
   -p 4444:4444 \
   -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
   panubo/mariadb-galera \
+    mysqld \
     --wsrep-new-cluster
 ```
 
@@ -63,7 +64,8 @@ docker run -d --net host --name galera \
   -p 4567-4568:4567-4568 \
   -p 4444:4444 \
   -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
-  panubo/mariadb-galera
+  panubo/mariadb-galera \
+    mysqld
 ```
 
 ## Recovery
@@ -89,10 +91,11 @@ docker run -d --net host --name galera-init \
   -p 4444:4444 \
   -v /mnt/data/galera.service/mysql:/var/lib/mysql:Z \
   panubo/mariadb-galera \
+    mysqld \
     --wsrep-new-cluster
 ```
 
-Finaly, bring up other nodes normally. Eg. (systemd example)
+Finally, bring up other nodes normally. Eg. (Systemd example)
 
 ```
 systemctl start galera.service
