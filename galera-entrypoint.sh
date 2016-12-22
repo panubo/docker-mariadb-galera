@@ -25,6 +25,7 @@ if [ -n "$WSREP_CLUSTER_ADDRESS" -a "$1" == 'mysqld' ]; then
 	wsrep_provider_options="${WSREP_PROVIDER_OPTIONS}"
 	wsrep_cluster_address="${WSREP_CLUSTER_ADDRESS}"
 	wsrep_cluster_name="${WSREP_CLUSTER_NAME:-my_wsrep_cluster}"
+	wsrep_node_name="${WSREP_NODE_NAME:-$(hostname)}"
 	wsrep_sst_auth="${WSREP_SST_AUTH}"
 	wsrep_sst_method="${WSREP_SST_METHOD:-rsync}"
 	EOF

@@ -14,6 +14,8 @@ Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webp
 - `WSREP_NODE_ADDRESS` - IP or domain of host interface eg `WSREP_NODE_ADDRESS=10.0.0.1`
 - `WSREP_CLUSTER_ADDRESS` - List of cluster nodes and ports eg `WSREP_CLUSTER_ADDRESS=gcomm://10.0.0.1:4567,10.0.0.2:4567,10.0.0.3:4567`
 - `WSREP_CLUSTER_NAME` - Default `my_wsrep_cluster`
+- `WSREP_NODE_NAME` - Defaults to the container hostname. You'll want to set this
+to something that doesn't change.
 
 ### Running Garbd
 
