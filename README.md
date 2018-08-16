@@ -1,9 +1,9 @@
-# Docker Container for MariaDB Galera Cluster
+# Docker Image for MariaDB Galera Cluster
 
-We hope that this container will not be required in the future pending the integration of better Galera support in the official container.
+We hope that this image will not be required in the future pending the integration of better Galera support in the official image.
 eg [PR 24](https://github.com/docker-library/mariadb/pull/24/files).
 
-This container uses entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` container.
+This image uses entrypoint modifications similar to the ones by [Kristian Klausen](https://github.com/klausenbusk/mariadb/blob/78df6f06732897bee0a69ee6332884f9cb1f5fbd/10.1/docker-entrypoint.sh) to provide (better) Galera support for the offcial `mariadb:10.1` image.
 
 Also included is [Galera Arbitrator](http://galeracluster.com/documentation-webpages/arbitrator.html) (aka `garbd`) which allows you to maintain quorum with a two node cluster. (Not required when running 3 or more nodes).
 
