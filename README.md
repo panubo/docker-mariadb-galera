@@ -1,3 +1,9 @@
+# Deprecation Notice!
+
+NB: This project is no longer maintained and the repository is archived.
+
+---
+
 # Docker Image for MariaDB Galera Cluster
 
 We hope that this image will not be required in the future pending the integration of better Galera support in the official image.
